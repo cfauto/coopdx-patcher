@@ -4,7 +4,7 @@ using System.IO.Compression;
 
 static class Program {
     static void Main(string[] args) {
-        Patcher.WriteLine("coopdx-patcher v0.0.2", ConsoleColor.Cyan);
+        Patcher.WriteLine("coopdx-patcher v0.1", ConsoleColor.Cyan);
 
         Patcher.CreateFolder(Patcher.appDataPath);
         Patcher.GetROM(args);

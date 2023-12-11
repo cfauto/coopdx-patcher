@@ -1,13 +1,11 @@
-﻿
-using System.Net.Http;
-using System;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Diagnostics;
 using coopdx_patcher.Properties;
 using System.Security.Cryptography;
 using System.Text;
 using System.Reflection;
+using System.Net;
 
 static class Patcher {
     public static readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "coopdx-patcher");
@@ -26,23 +24,18 @@ static class Patcher {
             File.Delete(savePath);
         }
 
-        try {
-            using (HttpClient client = new HttpClient()) {
-                HttpResponseMessage response = client.GetAsync(fileUrl).Result;
-
-                if (response.IsSuccessStatusCode) {
-                    using (Stream contentStream = response.Content.ReadAsStreamAsync().Result)
-                    using (Stream fileStream = File.Create(savePath)) {
-                        contentStream.CopyTo(fileStream);
-                    }
+        // 10 retry attempts
+        for (int i = 0; i < 10; i++) {
+            using (WebClient webClient = new WebClient()) {
+                try {
+                    webClient.DownloadFile(fileUrl, savePath);
                     return true;
-                } else {
-                    return false;
+                } catch {
+                    Write("\nFailed to download file, retrying...", ConsoleColor.Red);
                 }
             }
-        } catch {
-            return false;
         }
+        return false;
     }
 
     public static void WriteLine(string line, ConsoleColor color = ConsoleColor.Gray) {
@@ -59,7 +52,7 @@ static class Patcher {
 
     public static string CalculateFileSHA1(string path) {
         string sha = "";
-        using (var fs = new FileStream(path.Replace("\"", ""), FileMode.Open))
+        using (var fs = new FileStream(path, FileMode.Open))
         using (var bs = new BufferedStream(fs))
         using (var sha1 = new SHA1Managed()) {
             byte[] hash = sha1.ComputeHash(bs);
@@ -105,12 +98,12 @@ static class Patcher {
         // get ROM
         if (!File.Exists(romPath)) {
             if (args.Length > 0 && IsSM64USRom(args[0])) {
-                File.Copy(args[0], romPath);
+                File.Copy(args[0].Replace("\"", ""), romPath);
             } else {
                 string path = "";
                 while (string.IsNullOrEmpty(path) || !IsSM64USRom(path)) {
                     Write("Drag SM64 US .z64 ROM on this window and press enter: ", ConsoleColor.Yellow);
-                    path = Console.ReadLine();
+                    path = Console.ReadLine().Replace("\"", "");
                 }
                 File.Copy(path, romPath);
             }
