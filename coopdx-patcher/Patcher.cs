@@ -14,9 +14,6 @@ static class Patcher {
     public static readonly string resourcesPath = Path.Combine(outPath, "resources.zip");
     static readonly string romPath = Path.Combine(appDataPath, "baserom.us.z64");
 
-    public static readonly string bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
-    public static readonly string patchUrl = $"https://sm64coopdx.com/download/sm64coopdx_Windows_{bit}.bps";
-
     const string shaUsRom = "9bef1128717f958171a4afac3ed78ee2bb4e86ce";
 
     public static bool DownloadFile(string fileUrl, string savePath, bool overwrite = true) {
@@ -94,11 +91,11 @@ static class Patcher {
         if (log) Write(" Done!\n", ConsoleColor.Green);
     }
 
-    public static void GetROM(string[] args) {
+    public static void GetROM(string where) {
         // get ROM
         if (!File.Exists(romPath)) {
-            if (args.Length > 0 && IsSM64USRom(args[0])) {
-                File.Copy(args[0].Replace("\"", ""), romPath);
+            if (IsSM64USRom(where)) {
+                File.Copy(where.Replace("\"", ""), romPath);
             } else {
                 string path = "";
                 while (string.IsNullOrEmpty(path) || !IsSM64USRom(path)) {
@@ -121,7 +118,7 @@ static class Patcher {
         if (log) Write(" Done!\n", ConsoleColor.Green);
     }
 
-    public static void CreateExecutable() {
+    public static void CreateExecutable(string version) {
         Write("Applying patch file...", ConsoleColor.DarkGray);
 
         // write patcher to AppData
@@ -143,6 +140,10 @@ static class Patcher {
         Process process = new Process() { StartInfo = startInfo };
         process.Start();
         process.WaitForExit();
+
+        File.Delete(patchPath);
+        string path = Path.Combine(appDataPath, "version.txt");
+        File.WriteAllText(path, version);
 
         Write(" Done!\n", ConsoleColor.Green);
     }
