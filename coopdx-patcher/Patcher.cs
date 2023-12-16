@@ -74,6 +74,8 @@ static class Patcher {
     }
 
     public static bool IsSM64USRom(string path) {
+        if (string.IsNullOrEmpty(path)) { return false; }
+
         // calculate sha
         string sha = CalculateFileSHA1(path);
 

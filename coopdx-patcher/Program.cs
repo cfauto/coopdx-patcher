@@ -16,7 +16,7 @@ static class Program {
             return;
         }
 
-        Patcher.WriteLine("coopdx-patcher v0.1.1", ConsoleColor.Cyan);
+        Patcher.WriteLine("coopdx-patcher v0.1.2", ConsoleColor.Cyan);
 
         bool wine = false;
         if (args.Length > 1 && args[1] == "-l") wine = true;
