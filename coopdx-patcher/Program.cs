@@ -16,15 +16,11 @@ static class Program {
             return;
         }
 
-        Patcher.WriteLine("coopdx-patcher v0.1.2", ConsoleColor.Cyan);
-
-        bool wine = false;
-        if (args.Length > 1 && args[1] == "-l") wine = true;
+        Patcher.WriteLine("coopdx-patcher v0.1.2.1", ConsoleColor.Cyan);
 
         Patcher.GetROM(args.Length > 0 ? args[0] : "");
-        string os = wine ? "Linux" : "Windows";
         string bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
-        Patcher.Download("patch file", $"https://sm64coopdx.com/download/sm64coopdx_{os}_{bit}.bps", Patcher.patchPath, true);
+        Patcher.Download("patch file", $"https://sm64coopdx.com/download/sm64coopdx_Windows_{bit}.bps", Patcher.patchPath, true);
         Patcher.CreateFolder(Patcher.outPath, true);
         Patcher.CreateExecutable(version);
 
