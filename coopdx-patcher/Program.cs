@@ -16,7 +16,7 @@ static class Program {
             return;
         }
 
-        Patcher.WriteLine("coopdx-patcher v0.1.2.1", ConsoleColor.Cyan);
+        Patcher.WriteLine("coopdx-patcher v0.1.3", ConsoleColor.Cyan);
 
         Patcher.GetROM(args.Length > 0 ? args[0] : "");
         string bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
@@ -38,8 +38,16 @@ static class Program {
         Patcher.Write("Extracting resources...", ConsoleColor.DarkGray);
 
         // keep original dynos and mods folders intact
-        Patcher.RenameFolder(Path.Combine(Patcher.outPath, "mods"), Path.Combine(Patcher.outPath, "mods_backup"));
-        Patcher.RenameFolder(Path.Combine(Patcher.outPath, "dynos"), Path.Combine(Patcher.outPath, "dynos_backup"));
+        string modsBackup = Path.Combine(Patcher.outPath, "mods_backup");
+        string dynosBackup = Path.Combine(Patcher.outPath, "dynos_backup");
+        if (Directory.Exists(modsBackup)) {
+            Directory.Delete(modsBackup);
+        }
+        if (Directory.Exists(dynosBackup)) {
+            Directory.Delete(dynosBackup);
+        }
+        Patcher.RenameFolder(Path.Combine(Patcher.outPath, "mods"), modsBackup);
+        Patcher.RenameFolder(Path.Combine(Patcher.outPath, "dynos"), dynosBackup);
 
         // extract resources (dynos, lang and mods)
         Patcher.DeleteFolder(Path.Combine(Patcher.outPath, "lang"));
