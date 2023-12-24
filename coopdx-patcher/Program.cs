@@ -16,11 +16,11 @@ static class Program {
             return;
         }
 
-        Patcher.WriteLine("coopdx-patcher v0.1.3", ConsoleColor.Cyan);
+        Patcher.WriteLine("coopdx-patcher v0.2", ConsoleColor.Cyan);
 
         Patcher.GetROM(args.Length > 0 ? args[0] : "");
         string bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
-        Patcher.Download("patch file", $"https://sm64coopdx.com/download/sm64coopdx_Windows_{bit}.bps", Patcher.patchPath, true);
+        Patcher.Download("patch file", $"https://sm64coopdx.com/download/sm64coopdx_Windows_{bit}.bsdiff", Patcher.patchPath, true);
         Patcher.CreateFolder(Patcher.outPath, true);
         Patcher.CreateExecutable(version);
 

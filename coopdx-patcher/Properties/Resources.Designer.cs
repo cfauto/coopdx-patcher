@@ -59,15 +59,5 @@ namespace coopdx_patcher.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] flips {
-            get {
-                object obj = ResourceManager.GetObject("flips", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

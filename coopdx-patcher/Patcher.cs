@@ -1,18 +1,18 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
-using coopdx_patcher.Properties;
 using System.Security.Cryptography;
 using System.Text;
 using System.Reflection;
 using System.Net;
+using BsDiff;
 
 static class Patcher {
     public static readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "coopdx-patcher");
     public static readonly string outPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "sm64coopdx");
-    public static readonly string patchPath = Path.Combine(appDataPath, "sm64coopdx.bps");
+    public static readonly string patchPath = Path.Combine(appDataPath, "sm64coopdx.bsdiff");
     public static readonly string resourcesPath = Path.Combine(outPath, "resources.zip");
     static readonly string romPath = Path.Combine(appDataPath, "baserom.us.z64");
+    static readonly string exePath = Path.Combine(outPath, "sm64coopdx.exe");
 
     const string shaUsRom = "9bef1128717f958171a4afac3ed78ee2bb4e86ce";
 
@@ -123,25 +123,10 @@ static class Patcher {
     public static void CreateExecutable(string version) {
         Write("Applying patch file...", ConsoleColor.DarkGray);
 
-        // write patcher to AppData
-        string patcherPath = Path.Combine(appDataPath, "flips.exe");
-        if (!File.Exists(patcherPath)) {
-            File.WriteAllBytes(patcherPath, Resources.flips);
-        }
-
-        // create the patcher, patch sm64coopdx into the ROM
-        ProcessStartInfo startInfo = new ProcessStartInfo() {
-            FileName = patcherPath,
-            Arguments = $"-a {patchPath} {romPath} {Path.Combine(Path.GetFullPath(outPath), "sm64coopdx.exe")}",
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
         // run the patcher
-        Process process = new Process() { StartInfo = startInfo };
-        process.Start();
-        process.WaitForExit();
+        using (FileStream input = new FileStream(romPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (FileStream output = new FileStream(exePath, FileMode.Create))
+            BinaryPatch.Apply(input, () => new FileStream(patchPath, FileMode.Open, FileAccess.Read, FileShare.Read), output);
 
         File.Delete(patchPath);
         string path = Path.Combine(appDataPath, "version.txt");
