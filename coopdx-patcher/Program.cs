@@ -16,11 +16,29 @@ static class Program {
             return;
         }
 
-        Patcher.WriteLine("coopdx-patcher v0.2", ConsoleColor.Cyan);
+        Patcher.WriteLine("coopdx-patcher v0.2.1", ConsoleColor.Cyan);
 
         Patcher.GetROM(args.Length > 0 ? args[0] : "");
+
+        // ask for renderer but also keep compatibility with earlier versions
+        string renderer = "";
+        Patcher.Write("Use OpenGL or DirectX? [OpenGL|DirectX] ", ConsoleColor.Yellow);
+        string option = Console.ReadLine().ToLower();
+        while (option != "opengl" && option != "directx") {
+            Patcher.WriteLine("Invalid renderer", ConsoleColor.Yellow);
+            Patcher.Write("Use OpenGL or DirectX? [OpenGL|DirectX] ", ConsoleColor.Yellow);
+            option = Console.ReadLine().ToLower();
+        }
+        if (option == "directx") {
+            renderer = "DirectX_";
+        }
+
         string bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
-        Patcher.Download("patch file", $"https://sm64coopdx.com/download/sm64coopdx_Windows_{bit}.bsdiff", Patcher.patchPath, true);
+        if (!Patcher.Download("patch file", $"https://sm64coopdx.com/download/sm64coopdx_{renderer}Windows_{bit}.bsdiff", Patcher.patchPath, true)) {
+            Patcher.WriteLine("Press any key to exit.", ConsoleColor.Yellow);
+            Console.ReadKey();
+            return;
+        }
         Patcher.CreateFolder(Patcher.outPath, true);
         Patcher.CreateExecutable(version);
 

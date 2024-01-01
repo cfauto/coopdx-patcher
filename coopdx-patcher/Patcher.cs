@@ -21,8 +21,8 @@ static class Patcher {
             File.Delete(savePath);
         }
 
-        // 10 retry attempts
-        for (int i = 0; i < 10; i++) {
+        // 15 retry attempts
+        for (int i = 0; i < 15; i++) {
             using (WebClient webClient = new WebClient()) {
                 try {
                     webClient.DownloadFile(fileUrl, savePath);
@@ -109,15 +109,16 @@ static class Patcher {
         }
     }
 
-    public static void Download(string what, string url, string path, bool log = false) {
+    public static bool Download(string what, string url, string path, bool log = false) {
         if (log) Write($"Downloading {what}...", ConsoleColor.DarkGray);
 
         if (!DownloadFile(url, path)) {
-            WriteLine($"Failed to download {what}!", ConsoleColor.Red);
-            return;
+            WriteLine($"\nFailed to download {what}! Please try again later.", ConsoleColor.Red);
+            return false;
         }
 
         if (log) Write(" Done!\n", ConsoleColor.Green);
+        return true;
     }
 
     public static void CreateExecutable(string version) {
