@@ -7,6 +7,7 @@ using System.Net;
 using BsDiff;
 
 static class Patcher {
+    public static string version = "0.2.3";
     public static readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "coopdx-patcher");
     public static readonly string outPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "sm64coopdx");
     public static readonly string patchPath = Path.Combine(appDataPath, "sm64coopdx.bsdiff");
@@ -147,5 +148,21 @@ static class Patcher {
         if (!Directory.Exists(path)) return;
 
         Directory.Delete(path, true);
+    }
+    
+    public static bool CheckVersion() {
+        using (WebClient client = new WebClient()) {
+            try {
+                string responseBody = client.DownloadString("https://sm64coopdx.com/download/version_patcher.txt");
+                if (version != responseBody) {
+                    WriteLine($"A newer version of coopdx-patcher is available: v{responseBody}\nPlease update the patcher at https://github.com/coop-deluxe/coopdx-patcher/releases/latest to continue.", ConsoleColor.Yellow);
+                    return false;
+                }
+                return true;
+            } catch (WebException e) {
+                WriteLine("Failed to fetch latest version from server!", ConsoleColor.DarkGray);
+                return true;
+            }
+        }
     }
 }

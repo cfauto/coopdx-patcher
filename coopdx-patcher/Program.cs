@@ -16,12 +16,18 @@ static class Program {
             return;
         }
 
-        Patcher.WriteLine("coopdx-patcher v0.2.2", ConsoleColor.Cyan);
+        Patcher.WriteLine($"coopdx-patcher v{Patcher.version}", ConsoleColor.Cyan);
+
+        if (!Patcher.CheckVersion()) {
+            Patcher.WriteLine("Press any key to exit.", ConsoleColor.Yellow);
+            Console.ReadKey();
+            return;
+        }
 
         Patcher.GetROM(args.Length > 0 ? args[0] : "");
 
         // ask for renderer but also keep compatibility with earlier versions
-        string renderer = "";
+        string renderer = "OpenGL_";
         Patcher.Write("Use OpenGL or DirectX? (OpenGL is default) [OpenGL|DirectX] ", ConsoleColor.Yellow);
         string option = Console.ReadLine().ToLower().Trim();
         while (option != "" && option != "opengl" && option != "directx") {
@@ -41,6 +47,10 @@ static class Program {
         }
         Patcher.CreateFolder(Patcher.outPath, true);
         Patcher.CreateExecutable(version);
+
+        Patcher.Write("Downloading symbols...", ConsoleColor.DarkGray);
+        Patcher.Download("coop.map", $"https://sm64coopdx.com/download/maps/{bit}/{renderer}/coop.map", Path.Combine(Patcher.outPath, "coop.map"));
+        Patcher.Write(" Done!\n", ConsoleColor.Green);
 
         Patcher.Write("Downloading DLLs...", ConsoleColor.DarkGray);
         Patcher.Download("bass.dll", $"https://sm64coopdx.com/download/dlls/{bit}/bass.dll", Path.Combine(Patcher.outPath, "bass.dll"));
